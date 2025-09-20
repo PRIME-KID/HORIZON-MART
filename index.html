@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horizon Mart - Online Shopping Marketplace</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .hero {
+            background: linear-gradient(135deg, #1a237e 0%, #0d47a1 100%);
+            color: white;
+            padding: 80px 20px;
+            text-align: center;
+        }
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .hero-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .hero-actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+        .btn-primary {
+            background: #3366ff;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        .btn-primary:hover {
+            background: #254edb;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            padding: 15px 30px;
+            border: 2px solid white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-secondary:hover {
+            background: white;
+            color: #1a237e;
+        }
+        .features {
+            padding: 80px 20px;
+            background: #f8f9fa;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            text-align: center;
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            color: #3366ff;
+            margin-bottom: 20px;
+        }
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .feature-description {
+            color: #666;
+            line-height: 1.6;
+        }
+        .search-bar {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+        .search-bar input {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        .search-bar button {
+            background: #3366ff;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .highlight {
+            color: #3366ff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="logo"><i class="fas fa-shopping-basket"></i> Horizon Mart</span>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="seller-dashboard.html">Sellers</a>
+            <a href="ai-insights.html">AI Insights</a>
+            <a href="messages.html">Messages</a>
+            <a href="advertise.html">Advertise</a>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn nav-signin" onclick="window.location.href='signup.html'">Sign in</button>
+            <button class="nav-btn nav-join" onclick="window.location.href='signup.html'">Join Platform</button>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-title">
+            Discover Amazing Products at <span class="highlight">Horizon<br>Mart</span>
+        </div>
+        <div class="hero-subtitle">
+            Connect with sellers offering quality products, find the best deals, and enjoy a seamless shopping experience with our AI-powered marketplace platform.
+        </div>
+        <div class="hero-actions">
+            <button class="btn-primary" onclick="handleSellerSignup()">Start Selling</button>
+            <a href="marketplace.html" class="btn-secondary">Browse Marketplace</a>
+        </div>
+        <form class="search-bar" onsubmit="handleSearch(event)">
+            <input type="text" placeholder="Search products, categories, brands, sellers...">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+
+    <div class="features">
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-chart-line feature-icon"></i>
+                <h3 class="feature-title">Market Analysis</h3>
+                <p class="feature-description">Access real-time market data and advanced analytics tools to make informed decisions.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-robot feature-icon"></i>
+                <h3 class="feature-title">AI Insights</h3>
+                <p class="feature-description">Leverage artificial intelligence to predict market trends and optimize your strategies.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-users feature-icon"></i>
+                <h3 class="feature-title">Community</h3>
+                <p class="feature-description">Connect with other traders and investors to share knowledge and opportunities.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="user-profile.js"></script>
+    <script>
+        function handleSellerSignup() {
+            // Store the user type in localStorage
+            localStorage.setItem('userType', 'seller');
+            window.location.href = 'signup.html';
+        }
+
+        function handleSearch(event) {
+            event.preventDefault();
+            const searchTerm = event.target.querySelector('input').value;
+            if (searchTerm.trim()) {
+                window.location.href = `marketplace.html?search=${encodeURIComponent(searchTerm)}`;
+            }
+        }
+    </script>
+</body>
+</html>
+<!--THE SEARCH ITEM NEEDS SOME WORK-->

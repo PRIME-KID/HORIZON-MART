@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Insights | Crypto & Forex</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+        .insights-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 2rem;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .insights-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .insights-header h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: #1a202c;
+        }
+        .insights-header p {
+            color: #4a5568;
+            font-size: 1.125rem;
+        }
+        .section-header {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #2d3748;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 0.5rem;
+        }
+        .crypto-table, .forex-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+        .crypto-table th, .crypto-table td,
+        .forex-table th, .forex-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .crypto-table th, .forex-table th {
+            background-color: #f7fafc;
+            color: #4a5568;
+            font-weight: 600;
+        }
+        .crypto-table tbody tr, .forex-table tbody tr {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .crypto-table tbody tr:hover, .forex-table tbody tr:hover {
+            background-color: #edf2f7;
+        }
+        .ai-crypto-summary {
+            background-color: #f7fafc;
+            border-radius: 8px;
+            padding: 1.5rem;
+            min-height: 150px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            line-height: 1.6;
+            color: #2d3748;
+            white-space: pre-wrap;
+        }
+        .loading {
+            color: #4a5568;
+            text-align: center;
+            display: block;
+            font-style: italic;
+        }
+        .error {
+            color: #c53030;
+            font-weight: bold;
+        }
+        .market-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 1rem;
+        }
+        .market-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .market-list-item:last-child {
+            border-bottom: none;
+        }
+        .search-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .search-container input {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+        }
+        .search-container button {
+            padding: 0.75rem 1.5rem;
+            background-color: #4299e1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .search-container button:hover {
+            background-color: #3182ce;
+        }
+        
+        /* Modal styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+        .modal-content h3 {
+            margin-bottom: 15px;
+            color: #1a202c;
+            font-size: 1.25rem;
+        }
+        .modal-content p {
+            margin-bottom: 20px;
+        }
+        .modal-content button {
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="insights-container">
+        <div class="insights-header">
+            <h1 class="text-3xl font-bold">AI Insights</h1>
+            <p class="text-gray-600 mt-2">Real-time cryptocurrency and Forex market analysis powered by Gemini.</p>
+        </div>
+
+        <!-- Cryptocurrency Section -->
+        <div class="crypto-section">
+            <h2 class="section-header">Live Crypto Market</h2>
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search for a cryptocurrency...">
+                <button id="searchButton">Search</button>
+            </div>
+            <div id="cryptoMarketTable" class="overflow-x-auto">
+                <p class="loading">Loading market data...</p>
+            </div>
+        </div>
+
+        <!-- Section to display crypto trading examples, initially hidden -->
+        <div id="tradingExamplesSection" class="ai-section hidden">
+            <h2 id="tradingSectionHeader" class="section-header">Trading Examples</h2>
+            <div id="tradingExamplesContent" class="bg-white rounded-lg shadow-md p-4 mt-4">
+                <p class="loading">Select a coin to view its markets.</p>
+            </div>
+        </div>
+        
+        <!-- Forex Section -->
+        <div class="forex-section mt-8">
+            <h2 class="section-header">Live Forex Market</h2>
+            <div class="search-container">
+                <input type="text" id="forexSearchInput" placeholder="Search for a currency pair (e.g., USD/JPY)...">
+                <button id="forexSearchButton">Search</button>
+            </div>
+            <div id="forexMarketTable" class="overflow-x-auto">
+                <p class="loading">Search for a currency pair to see live rates.</p>
+            </div>
+        </div>
+
+        <div class="ai-section">
+            <h2 class="section-header">Gemini AI Summary</h2>
+            <div id="aiCryptoSummary" class="ai-crypto-summary">
+                <p class="loading">Fetching AI insights...</p>
+            </div>
+            <button id="refreshButton" class="mt-4 px-6 py-3 bg-blue-600 text-white font-semibold rounded-md shadow-md hover:bg-blue-700 transition-colors">
+                Refresh Insights
+            </button>
+        </div>
+    </div>
+
+    <!-- Custom Modal for messages -->
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <p id="modalMessage"></p>
+            <button onclick="closeModal()">OK</button>
+        </div>
+    </div>
+
+    <script>
+        // DOM element references
+        const cryptoMarketTable = document.getElementById('cryptoMarketTable');
+        const forexMarketTable = document.getElementById('forexMarketTable');
+        const aiCryptoSummary = document.getElementById('aiCryptoSummary');
+        const refreshButton = document.getElementById('refreshButton');
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const forexSearchInput = document.getElementById('forexSearchInput');
+        const forexSearchButton = document.getElementById('forexSearchButton');
+        const tradingExamplesSection = document.getElementById('tradingExamplesSection');
+        const tradingSectionHeader = document.getElementById('tradingSectionHeader');
+        const tradingExamplesContent = document.getElementById('tradingExamplesContent');
+
+        let cryptoData = [];
+        let forexData = [];
+        let currentDisplayedCoinData = [];
+
+        // Modal functions
+        const modal = document.getElementById('customModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Function to fetch data with exponential backoff
+        async function fetchWithRetry(url, options = {}, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(`HTTP error! status: ${response.status} - ${errorData.error?.message || response.statusText}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (i < retries - 1) {
+                        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                    } else {
+                        throw error;
+                    }
+                }
+            }
+        }
+
+        // Main function to load cryptocurrencies
+        async function loadCryptos(query = null) {
+            cryptoMarketTable.innerHTML = `<p class="loading">Loading market data...</p>`;
+            try {
+                let endpoint;
+                if (query) {
+                    endpoint = `https://api.coingecko.com/api/v3/search?query=${encodeURIComponent(query)}`;
+                    const searchResults = await fetchWithRetry(endpoint);
+                    currentDisplayedCoinData = searchResults.coins.map(coin => ({
+                        id: coin.id,
+                        name: coin.name,
+                        symbol: coin.symbol,
+                        image: coin.large || coin.thumb,
+                        // Search API doesn't provide price or change, so we fetch it later
+                    }));
+                    // The search API returns limited data, so we'll fetch prices for the top 10 results
+                    const coinIds = currentDisplayedCoinData.slice(0, 10).map(c => c.id).join(',');
+                    if (coinIds) {
+                        const marketData = await fetchWithRetry(`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinIds}&sparkline=false&price_change_percentage=24h`);
+                        currentDisplayedCoinData = marketData;
+                    }
+                } else {
+                    endpoint = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false&price_change_percentage=24h";
+                    currentDisplayedCoinData = await fetchWithRetry(endpoint);
+                }
+                
+                cryptoData = currentDisplayedCoinData;
+                renderCryptoTable(currentDisplayedCoinData);
+                getAICryptoSummary();
+                tradingExamplesSection.classList.add('hidden'); // Hide trading examples after a new search
+            } catch (err) {
+                console.error("Error fetching crypto data:", err);
+                cryptoMarketTable.innerHTML = `<p class="error loading">Error loading crypto data. Please try again later.</p>`;
+                showModal("Error", "Error fetching crypto data. Please check your network and try again.");
+            }
+        }
+
+        // Function to render the crypto market data in a table
+        function renderCryptoTable(data) {
+            if (!data || data.length === 0) {
+                cryptoMarketTable.innerHTML = `<p class="text-center text-gray-500 mt-4">No cryptocurrencies found.</p>`;
+                return;
+            }
+
+            const tableHTML = `
+                <table class="crypto-table rounded-lg overflow-hidden shadow-md">
+                    <thead>
+                        <tr>
+                            <th class="w-1/12">#</th>
+                            <th class="w-4/12">Coin</th>
+                            <th class="w-3/12">Price</th>
+                            <th class="w-4/12">24h Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cryptoTableBody">
+                        ${data.map((coin, index) => `
+                            <tr data-coin-id="${coin.id}">
+                                <td>${index + 1}</td>
+                                <td class="flex items-center">
+                                    <img src="${coin.image}" alt="${coin.name} logo" class="w-6 h-6 rounded-full mr-2">
+                                    <div class="flex flex-col">
+                                        <span class="font-semibold text-gray-800">${coin.name}</span>
+                                        <span class="text-xs text-gray-500 uppercase">${coin.symbol}</span>
+                                    </div>
+                                </td>
+                                <td>$${(coin.current_price || 0).toLocaleString()}</td>
+                                <td class="${(coin.price_change_percentage_24h || 0) > 0 ? 'text-green-600' : 'text-red-600'} font-medium">
+                                    ${(coin.price_change_percentage_24h || 0).toFixed(2)}%
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            cryptoMarketTable.innerHTML = tableHTML;
+        }
+        
+        // Function to load Forex markets
+        async function loadForexMarkets(query) {
+            forexMarketTable.innerHTML = `<p class="loading">Loading Forex data...</p>`;
+            try {
+                // Using a mock API endpoint for demonstration. Replace with a real API if available.
+                const endpoint = `https://api.exchangerate-api.com/v4/latest/USD`;
+                const response = await fetchWithRetry(endpoint);
+                
+                // Filter the results based on the query. For a real API, the query would be in the request.
+                const rates = response.rates;
+                forexData = [];
+
+                if (query) {
+                    const [base, target] = query.toUpperCase().split('/');
+                    if (rates[base] && rates[target]) {
+                        // For a real API, this would be a single call. Here we simulate.
+                        const rate = rates[target] / rates[base];
+                        forexData.push({ pair: query.toUpperCase(), rate: rate, change: (Math.random() - 0.5).toFixed(4) }); // Simulating change
+                    } else {
+                        forexData = []; // No results
+                    }
+                } else {
+                    // Default to some popular pairs if no query is provided.
+                    const popularPairs = ['USD/EUR', 'USD/JPY', 'GBP/USD'];
+                    popularPairs.forEach(pair => {
+                        const [base, target] = pair.split('/');
+                        if (rates[base] && rates[target]) {
+                            const rate = rates[target] / rates[base];
+                            forexData.push({ pair, rate: rate, change: (Math.random() - 0.5).toFixed(4) }); // Simulating change
+                        }
+                    });
+                }
+                
+                renderForexTable(forexData);
+                getAICryptoSummary();
+            } catch (err) {
+                console.error("Error fetching Forex data:", err);
+                forexMarketTable.innerHTML = `<p class="error loading">Error loading Forex data. Please try again later.</p>`;
+                showModal("Error", "Error fetching Forex data. Please check your network and try again.");
+            }
+        }
+        
+        // Function to render the Forex market data in a table
+        function renderForexTable(data) {
+            if (!data || data.length === 0) {
+                forexMarketTable.innerHTML = `<p class="text-center text-gray-500 mt-4">No Forex pairs found.</p>`;
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="forex-table rounded-lg overflow-hidden shadow-md">
+                    <thead>
+                        <tr>
+                            <th class="w-5/12">Pair</th>
+                            <th class="w-5/12">Rate</th>
+                            <th class="w-2/12">Change</th>
+                        </tr>
+                    </thead>
+                    <tbody id="forexTableBody">
+                        ${data.map((pair, index) => `
+                            <tr data-pair="${pair.pair}">
+                                <td>${pair.pair}</td>
+                                <td>${pair.rate.toFixed(4)}</td>
+                                <td class="${pair.change > 0 ? 'text-green-600' : 'text-red-600'} font-medium">
+                                    ${pair.change}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            forexMarketTable.innerHTML = tableHTML;
+        }
+
+        // Function to show trading examples for a selected coin
+        async function showTradingExamples(coinId, coinName) {
+            tradingExamplesSection.classList.remove('hidden');
+            tradingSectionHeader.textContent = `Trading Markets for ${coinName}`;
+            tradingExamplesContent.innerHTML = `<p class="loading">Loading trading markets...</p>`;
+
+            try {
+                const endpoint = `https://api.coingecko.com/api/v3/coins/${coinId}/tickers`;
+                const response = await fetchWithRetry(endpoint);
+                const markets = response.tickers.slice(0, 10); // Show top 10 markets
+
+                if (markets.length === 0) {
+                    tradingExamplesContent.innerHTML = `<p class="text-gray-500 text-center">No trading markets found for this coin.</p>`;
+                    return;
+                }
+
+                const marketsHtml = `
+                    <ul class="market-list">
+                        ${markets.map(market => `
+                            <li class="market-list-item">
+                                <span class="font-medium text-gray-800">${market.market.name}</span>
+                                <span class="text-sm text-gray-600">Price: $${market.converted_last.usd.toLocaleString()}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                tradingExamplesContent.innerHTML = marketsHtml;
+            } catch (err) {
+                console.error("Error fetching trading examples:", err);
+                tradingExamplesContent.innerHTML = `<p class="error">Error loading trading markets. Please try again.</p>`;
+            }
+        }
+
+        // Function to get AI-powered summary using the Gemini API
+        async function getAICryptoSummary() {
+            aiCryptoSummary.innerHTML = `<p class="loading">Thinking... Analyzing market data...</p>`;
+            
+            const combinedData = [];
+            
+            if (cryptoData.length > 0) {
+                const cryptoSummary = cryptoData.map(coin =>
+                    `Name: ${coin.name}, Symbol: ${coin.symbol}, Price: $${(coin.current_price || 0).toLocaleString()}, 24h Change: ${(coin.price_change_percentage_24h || 0).toFixed(2)}%`
+                ).join('\n');
+                combinedData.push(`--- CRYPTOCURRENCY MARKET DATA ---\n${cryptoSummary}`);
+            }
+
+            if (forexData.length > 0) {
+                const forexSummary = forexData.map(pair =>
+                    `Pair: ${pair.pair}, Rate: ${pair.rate.toFixed(4)}, Change: ${pair.change}%`
+                ).join('\n');
+                combinedData.push(`--- FOREX MARKET DATA ---\n${forexSummary}`);
+            }
+            
+            if (combinedData.length === 0) {
+                aiCryptoSummary.innerHTML = `<p class="error loading">No market data to analyze. Cannot generate summary.</p>`;
+                return;
+            }
+
+            const prompt = `Based on the following market data, provide a comprehensive financial analysis. The analysis should include:
+            1. A summary of the current market trends, covering both crypto and Forex.
+            2. An explanation of one significant trend or event based on the combined data.
+            3. Three distinct, robust pieces of financial advice for different types of investors.
+            
+            Market Data:
+            ${combinedData.join('\n\n')}
+            `;
+
+            const chatHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            const payload = { contents: chatHistory };
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({}));
+                    throw new Error(`API error: ${response.status} - ${errorDetails.error?.message || response.statusText}`);
+                }
+
+                let result;
+                try {
+                    result = await response.json();
+                } catch (e) {
+                    throw new Error(`API returned a non-JSON response. Error: ${e.message}`);
+                }
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    aiCryptoSummary.textContent = text.trim();
+                } else {
+                    throw new Error("Invalid response format from Gemini API.");
+                }
+            } catch (err) {
+                console.error("Error fetching AI summary:", err);
+                aiCryptoSummary.innerHTML = `<p class="error loading">Error: Unable to fetch AI summary. Please try again later. Details: ${err.message}</p>`;
+                showModal("API Error", `Unable to fetch AI summary. Details: ${err.message}`);
+            }
+        }
+
+        // Event listeners
+        refreshButton.addEventListener('click', () => {
+            loadCryptos();
+            loadForexMarkets();
+        });
+        searchButton.addEventListener('click', () => {
+            const query = searchInput.value.trim();
+            loadCryptos(query);
+        });
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                loadCryptos(query);
+            }
+        });
+        forexSearchButton.addEventListener('click', () => {
+            const query = forexSearchInput.value.trim();
+            loadForexMarkets(query);
+        });
+        forexSearchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = forexSearchInput.value.trim();
+                loadForexMarkets(query);
+            }
+        });
+        document.getElementById('cryptoMarketTable').addEventListener('click', (e) => {
+            const row = e.target.closest('tr');
+            if (row) {
+                const coinId = row.getAttribute('data-coin-id');
+                const coinName = row.querySelector('.font-semibold').textContent;
+                showTradingExamples(coinId, coinName);
+            }
+        });
+
+        // Initial load of the page
+        window.onload = () => {
+            loadCryptos();
+            // Load some default Forex data
+            loadForexMarkets('USD/EUR');
+        };
+    </script>
+</body>
+</html>

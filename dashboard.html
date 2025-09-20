@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Horizon Mart</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .welcome-section {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            padding: 30px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .welcome-text h1 {
+            font-size: 2rem;
+            color: #181c32;
+            margin-bottom: 10px;
+        }
+        .welcome-text p {
+            color: #555;
+            font-size: 1.1rem;
+        }
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        .profile-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            overflow: hidden;
+        }
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-photo i {
+            font-size: 2.5rem;
+            color: #999;
+        }
+        .user-info h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        .user-info p {
+            color: #666;
+            margin: 0;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .dashboard-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: #3366ff;
+        }
+        .dashboard-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .dashboard-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        .card-link {
+            display: inline-block;
+            color: #3366ff;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .card-link:hover {
+            text-decoration: underline;
+        }
+        .logout-btn, .refresh-btn {
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s ease;
+            margin-left: 10px;
+        }
+        .logout-btn {
+            background: #f44336;
+        }
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
+        .refresh-btn {
+            background: #4caf50;
+        }
+        .refresh-btn:hover {
+            background: #388e3c;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="logo" onclick="window.location.href='dashboard.html'" style="cursor: pointer;"><i class="fas fa-shopping-basket"></i> Horizon Mart</span>
+            <a href="dashboard.html" class="active">Dashboard</a>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="advertise.html">Advertise</a>
+            <a href="messages.html">Messages</a>
+            <a href="ai-insights.html">AI Insights</a>
+        </div>
+        <div class="nav-right" id="userNav">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="welcome-section">
+            <div class="welcome-text">
+                <h1>Welcome to Your Dashboard</h1>
+                <p>Manage your shopping activities and preferences</p>
+            </div>
+            <div class="user-profile">
+                <div class="profile-photo" id="profilePhoto">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info" id="userInfo">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="dashboard-card">
+                <i class="fas fa-chart-line card-icon"></i>
+                <h3>Shopping Overview</h3>
+                <p>View your shopping history and analytics</p>
+                <a href="#" class="card-link">View Analytics <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="dashboard-card">
+                <i class="fas fa-shopping-cart card-icon"></i>
+                <h3>Marketplace</h3>
+                <p>Browse and purchase products</p>
+                <a href="marketplace.html" class="card-link">Explore Marketplace <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="dashboard-card">
+                <i class="fas fa-comment-dollar card-icon"></i>
+                <h3>Messages</h3>
+                <p>Connect with sellers and customer service</p>
+                <a href="messages.html" class="card-link">View Messages <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="dashboard-card">
+                <i class="fas fa-robot card-icon"></i>
+                <h3>AI Insights</h3>
+                <p>Get personalized shopping recommendations</p>
+                <a href="ai-insights.html" class="card-link">View Insights <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="dashboard-card">
+                <i class="fas fa-cog card-icon"></i>
+                <h3>Account Settings</h3>
+                <p>Manage your profile and preferences</p>
+                <a href="settings.html" class="card-link">Edit Settings <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="dashboard-card">
+                <i class="fas fa-question-circle card-icon"></i>
+                <h3>Help & Support</h3>
+                <p>Get assistance with any questions or issues</p>
+                <a href="#" class="card-link">Contact Support <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <script src="user-profile.js"></script>
+    <script>
+        // Function to fetch latest user data from server
+        async function fetchUserData(email) {
+            try {
+                const response = await fetch(`http://localhost:3002/api/user?email=${encodeURIComponent(email)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // Ensure profile photo URL is properly formatted
+                    const userData = data.user;
+                    if (userData.profilePhoto && !userData.profilePhoto.startsWith('http')) {
+                        userData.profilePhoto = `http://localhost:3002${userData.profilePhoto}`;
+                    }
+                    return userData;
+                } else {
+                    console.error('Failed to fetch user data');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                return null;
+            }
+        }
+
+        // Function to update dashboard-specific UI with user data
+        function updateDashboardInterface(user) {
+            // Update user info in the dashboard section
+            const userInfo = document.getElementById('userInfo');
+            userInfo.innerHTML = `
+                <h3>${user.firstName} ${user.lastName}</h3>
+                <p>${user.email}</p>
+                <p>${user.userType.charAt(0).toUpperCase() + user.userType.slice(1)}</p>
+            `;
+
+            // Update profile photo in the dashboard section if available
+            const profilePhoto = document.getElementById('profilePhoto');
+            if (profilePhoto.tagName.toLowerCase() !== 'img') {
+                if (user.profilePhoto) {
+                    profilePhoto.innerHTML = `<img src="${user.profilePhoto}" alt="Profile Photo">`;
+                } else if (user.profilePhotoUrl) {
+                    profilePhoto.innerHTML = `<img src="${user.profilePhotoUrl}" alt="Profile Photo">`;
+                }
+            }
+
+            // Add refresh functionality
+            const refreshBtn = document.querySelector('.refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', async () => {
+                    const refreshedUser = await fetchUserData(user.email);
+                    if (refreshedUser) {
+                        localStorage.setItem('user', JSON.stringify(refreshedUser));
+                        // Update both the dashboard interface and the common user profile elements
+                        updateDashboardInterface(refreshedUser);
+                        updateUserNavigation();
+                        updateProfilePhotos();
+                        alert('User data refreshed successfully!');
+                    }
+                });
+            }
+        }
+
+        // Check if user is logged in and initialize dashboard
+        document.addEventListener('DOMContentLoaded', async () => {
+            const user = getUserData();
+            if (!user) {
+                // Redirect to login if not logged in
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Update dashboard-specific UI with stored user data
+            updateDashboardInterface(user);
+            
+            // Try to fetch latest user data
+            const latestUser = await fetchUserData(user.email);
+            if (latestUser) {
+                localStorage.setItem('user', JSON.stringify(latestUser));
+                updateDashboardInterface(latestUser);
+                // Also update the common user profile elements
+                updateUserNavigation();
+                updateProfilePhotos();
+            }
+        });
+    </script>
+</body>
+</html>
+<!--THE PROFILE IMAGE  IS FAILING-->

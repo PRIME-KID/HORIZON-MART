@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Horizon Mart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .checkout-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+                margin: 20px auto;
+            }
+        }
+
+        .order-summary {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .order-summary h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            color: #2a41e8;
+            font-weight: 600;
+        }
+
+        .cart-items {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+        }
+        
+        .cart-items::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .cart-items::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .cart-items::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        .cart-items::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .cart-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .cart-item-details {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .cart-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-category {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            font-weight: 600;
+            color: #2a41e8;
+        }
+
+        .order-totals {
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+        .order-total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .order-total-row.final {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .payment-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+        .payment-section h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            color: #2a41e8;
+            font-weight: 600;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #2a41e8;
+            box-shadow: 0 0 0 3px rgba(42, 65, 232, 0.1);
+            outline: none;
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .payment-method {
+            border: 2px solid #eaeaea;
+            border-radius: 10px;
+            padding: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            background-color: #fafafa;
+        }
+
+        .payment-method:hover {
+            border-color: #2a41e8;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 65, 232, 0.1);
+        }
+
+        .payment-method.selected {
+            border-color: #2a41e8;
+            background-color: rgba(42, 65, 232, 0.05);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(42, 65, 232, 0.1);
+        }
+
+        .payment-method i {
+            font-size: 28px;
+            margin-right: 15px;
+            color: #2a41e8;
+        }
+        
+        .payment-method span {
+            font-weight: 600;
+            color: #444;
+        }
+
+        .payment-fields {
+            margin-top: 25px;
+            display: none;
+            background-color: #f9fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #eaeaea;
+            transition: all 0.3s ease;
+        }
+
+        .payment-fields.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .stripe-element {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .stripe-element--focus {
+            border-color: #2a41e8;
+            box-shadow: 0 0 0 3px rgba(42, 65, 232, 0.1);
+        }
+
+        .stripe-element--invalid {
+            border-color: #fa755a;
+            box-shadow: 0 0 0 3px rgba(250, 117, 90, 0.1);
+        }
+
+        .error-message {
+            color: #fa755a;
+            margin-top: 12px;
+            padding: 10px 15px;
+            background-color: rgba(250, 117, 90, 0.1);
+            border-left: 3px solid #fa755a;
+            border-radius: 4px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .terms-group {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .terms-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+
+        .submit-button {
+            background-color: #2a41e8;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(42, 65, 232, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-button:hover {
+            background-color: #1a31d8;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(42, 65, 232, 0.3);
+        }
+
+        .submit-button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 40px;
+            background-color: #f0fff4;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin: 30px 0;
+            border: 1px solid #d4edda;
+        }
+
+        .success-message i {
+            font-size: 70px;
+            color: #28a745;
+            margin-bottom: 25px;
+            animation: scaleIn 0.5s ease-in-out;
+        }
+        
+        @keyframes scaleIn {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .success-message h2 {
+            color: #28a745;
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .success-message p {
+            color: #495057;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+
+        .empty-cart-message {
+            text-align: center;
+            padding: 50px 0;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        .empty-cart-message i {
+            font-size: 70px;
+            color: #6c757d;
+            margin-bottom: 25px;
+            opacity: 0.7;
+        }
+
+        .empty-cart-message h2 {
+            margin-bottom: 15px;
+            color: #495057;
+            font-size: 1.8rem;
+        }
+        
+        .empty-cart-message p {
+            color: #6c757d;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+        }
+
+        .empty-cart-message .submit-button {
+            max-width: 250px;
+            margin: 25px auto 0;
+            padding: 12px 20px;
+        }
+
+        .security-info {
+            display: flex;
+            align-items: center;
+            margin-top: 25px;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+
+        .security-info i {
+            font-size: 22px;
+            color: #28a745;
+            margin-right: 15px;
+        }
+
+        .security-info p {
+            margin: 0;
+            font-size: 14px;
+            color: #444;
+            font-weight: 500;
+        }
+
+        .payment-icons {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .payment-icons i {
+            font-size: 28px;
+            color: #555;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-icons i:hover {
+            color: #2a41e8;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="nav-left">
+                <div class="logo">
+                    <img src="logo.png" alt="Horizon Mart Logo" style="height: 32px; width: auto;">
+                    <span>Horizon Mart</span>
+                </div>
+                <a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a>
+                <a href="marketplace.html" class="active"><i class="fas fa-store"></i> Marketplace</a>
+                <a href="advertise.html"><i class="fas fa-ad"></i> Advertise</a>
+                <a href="messages.html"><i class="fas fa-envelope"></i> Messages</a>
+                <a href="ai-insights.html"><i class="fas fa-robot"></i> AI Insights</a>
+            </div>
+            <div class="nav-right">
+                <div style="position: relative; margin-right: 15px;">
+                    <i class="fas fa-bell" style="font-size: 1.2rem; color: #3366ff; cursor: pointer;"></i>
+                    <span style="position: absolute; top: -8px; right: -8px; background: #ff3366; color: white; border-radius: 50%; font-size: 0.7rem; padding: 2px 6px; font-weight: 700;">3</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <img src="profile-placeholder.jpg" alt="User Profile" id="profilePhoto" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;">
+                    <span id="userName" style="font-weight: 600;">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="checkout-container" id="checkoutContainer">
+            <!-- Order Summary Section -->
+            <div class="order-summary">
+                <h2><i class="fas fa-shopping-cart"></i> Order Summary</h2>
+                <div id="cartContent">
+                    <!-- Cart items will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Payment Section -->
+            <div class="payment-section">
+                <h2><i class="fas fa-credit-card"></i> Payment Details</h2>
+                <form id="payment-form">
+                    <!-- Personal Information -->
+                    <div class="form-section">
+                        <h3>Personal Information</h3>
+                        <div class="form-group">
+                            <label for="name">Full Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 123-4567" required>
+                        </div>
+                    </div>
+
+                    <!-- Payment Method Selection -->
+                    <div class="form-section">
+                        <h3>Payment Method</h3>
+                        <div class="payment-methods">
+                            <div class="payment-method" data-method="credit-card">
+                                <i class="fas fa-credit-card"></i>
+                                <span>Credit Card</span>
+                            </div>
+                            <div class="payment-method" data-method="paypal">
+                                <i class="fab fa-paypal"></i>
+                                <span>PayPal</span>
+                            </div>
+                            <div class="payment-method" data-method="bank-transfer">
+                                <i class="fas fa-university"></i>
+                                <span>Bank Transfer</span>
+                            </div>
+                            <div class="payment-method" data-method="crypto">
+                                <i class="fab fa-bitcoin"></i>
+                                <span>Cryptocurrency</span>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="payment-method" name="payment-method" required>
+
+                        <!-- Credit Card Fields -->
+                        <div id="credit-card-fields" class="payment-fields">
+                            <div class="form-group">
+                                <label>Card Information</label>
+                                <div id="card-element" class="stripe-element"></div>
+                                <div id="card-errors" class="error-message" role="alert"></div>
+                            </div>
+                        </div>
+
+                        <!-- PayPal Fields -->
+                        <div id="paypal-fields" class="payment-fields">
+                            <div style="display: flex; align-items: center; background-color: #f0f7ff; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                                <i class="fab fa-paypal" style="font-size: 28px; color: #0070ba; margin-right: 15px;"></i>
+                                <p style="margin: 0; color: #444;">You will be redirected to PayPal to complete your payment securely.</p>
+                            </div>
+                            <div id="paypal-errors" class="error-message" role="alert"></div>
+                        </div>
+
+                        <!-- Bank Transfer Fields -->
+                        <div id="bank-transfer-fields" class="payment-fields">
+                            <div style="display: flex; align-items: center; background-color: #f0f7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                <i class="fas fa-university" style="font-size: 28px; color: #2a41e8; margin-right: 15px;"></i>
+                                <p style="margin: 0; color: #444;">Please enter your bank account details for the transfer.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="account-number">Account Number</label>
+                                <input type="text" id="account-number" name="account-number" placeholder="Enter your account number">
+                            </div>
+                            <div class="form-group">
+                                <label for="routing-number">Routing Number</label>
+                                <input type="text" id="routing-number" name="routing-number" placeholder="Enter your routing number">
+                            </div>
+                            <div id="bank-transfer-errors" class="error-message" role="alert"></div>
+                        </div>
+
+                        <!-- Crypto Fields -->
+                        <div id="crypto-fields" class="payment-fields">
+                            <div style="display: flex; align-items: center; background-color: #f0f7ff; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                                <i class="fab fa-bitcoin" style="font-size: 28px; color: #f7931a; margin-right: 15px;"></i>
+                                <p style="margin: 0; color: #444;">Enter your cryptocurrency wallet address to complete the transaction.</p>
+                            </div>
+                            <div class="form-group">
+                                <label for="crypto-wallet">Crypto Wallet Address</label>
+                                <input type="text" id="crypto-wallet" name="crypto-wallet" placeholder="Enter your wallet address">
+                            </div>
+                            <div class="form-group">
+                                <label for="crypto-currency">Select Cryptocurrency</label>
+                                <select id="crypto-currency" name="crypto-currency">
+                                    <option value="bitcoin">Bitcoin (BTC)</option>
+                                    <option value="ethereum">Ethereum (ETH)</option>
+                                    <option value="litecoin">Litecoin (LTC)</option>
+                                    <option value="ripple">Ripple (XRP)</option>
+                                </select>
+                            </div>
+                            <div id="crypto-errors" class="error-message" role="alert"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-group terms-group">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">I agree to the <a href="#" class="terms-link">Terms and Conditions</a></label>
+                    </div>
+
+                    <button type="submit" class="submit-button">
+                        <i class="fas fa-lock"></i> Complete Payment
+                    </button>
+                    <p style="text-align: center; margin-top: 15px; font-size: 14px; color: #666;">
+                        By clicking "Complete Payment", you agree to our <a href="#" style="color: #2a41e8; text-decoration: none;">Terms of Service</a>
+                    </p>
+
+                    <div class="security-info">
+                        <i class="fas fa-shield-alt"></i>
+                        <p>Your payment information is encrypted and secure</p>
+                    </div>
+                    <div class="payment-icons">
+                        <i class="fab fa-cc-visa"></i>
+                        <i class="fab fa-cc-mastercard"></i>
+                        <i class="fab fa-cc-amex"></i>
+                        <i class="fab fa-paypal"></i>
+                        <i class="fab fa-bitcoin"></i>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer style="background-color: #181c32; color: #fff; padding: 40px 0 0; margin-top: 60px;">
+        <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; padding: 0 20px;">
+            <div>
+                <h3 style="color: #fff; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600;">About Horizon Mart</h3>
+                <p style="color: #b0b7c3; line-height: 1.6;">Your trusted marketplace for financial products and services.</p>
+            </div>
+            <div>
+                <h3 style="color: #fff; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600;">Quick Links</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 10px;"><a href="dashboard.html" style="color: #b0b7c3; text-decoration: none; transition: color 0.2s;">Dashboard</a></li>
+                    <li style="margin-bottom: 10px;"><a href="marketplace.html" style="color: #b0b7c3; text-decoration: none; transition: color 0.2s;">Marketplace</a></li>
+                    <li style="margin-bottom: 10px;"><a href="advertise.html" style="color: #b0b7c3; text-decoration: none; transition: color 0.2s;">Advertise</a></li>
+                    <li style="margin-bottom: 10px;"><a href="messages.html" style="color: #b0b7c3; text-decoration: none; transition: color 0.2s;">Messages</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: #fff; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600;">Contact Us</h3>
+                <p style="color: #b0b7c3; margin-bottom: 10px;"><i class="fas fa-envelope" style="margin-right: 10px; color: #3366ff;"></i> support@horizonmart.com</p>
+                <p style="color: #b0b7c3;"><i class="fas fa-phone" style="margin-right: 10px; color: #3366ff;"></i> +1 (555) 123-4567</p>
+            </div>
+            <div>
+                <h3 style="color: #fff; margin-bottom: 20px; font-size: 1.2rem; font-weight: 600;">Follow Us</h3>
+                <div style="display: flex; gap: 15px;">
+                    <!--SOCIAL MEDIA LINKS-->
+                    <a href="#" style="color: #b0b7c3; font-size: 1.5rem; transition: color 0.2s;"><i class="fab fa-facebook"></i></a>
+                    <a href="#" style="color: #b0b7c3; font-size: 1.5rem; transition: color 0.2s;"><i class="fab fa-twitter"></i></a>
+                    <a href="#" style="color: #b0b7c3; font-size: 1.5rem; transition: color 0.2s;"><i class="fab fa-instagram"></i></a>
+                    <a href="#" style="color: #b0b7c3; font-size: 1.5rem; transition: color 0.2s;"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <div style="background-color: #13162c; padding: 20px 0; margin-top: 40px; text-align: center;">
+            <p style="color: #b0b7c3; margin: 0;">&copy; 2023 Horizon Mart. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="user-profile.js"></script>
+    <script src="checkout.js"></script>
+</body>
+</html>

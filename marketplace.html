@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace | Horizon Mart</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .navbar {
+            width: 100%;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 32px;
+            height: 64px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            color: #181c32;
+            margin-right: 24px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .navbar a {
+            color: #181c32;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.2s;
+        }
+        .navbar a.active, .navbar a:hover {
+            color: #3366ff;
+        }
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .nav-btn {
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .nav-signin {
+            background: #fff;
+            color: #181c32;
+            border: 1.5px solid #181c32;
+        }
+        .nav-signin:hover {
+            background: #f0f4ff;
+        }
+        .nav-join {
+            background: #181c32;
+            color: #fff;
+        }
+        .nav-join:hover {
+            background: #3366ff;
+        }
+        .cart-btn {
+            background: none;
+            border: none;
+            position: relative;
+            font-size: 1.4rem;
+            color: #3366ff;
+            cursor: pointer;
+        }
+        .cart-count {
+            position: absolute;
+            top: -6px;
+            right: -10px;
+            background: #3366ff;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            padding: 2px 7px;
+            font-weight: 700;
+        }
+        .marketplace-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 16px;
+        }
+        .marketplace-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .marketplace-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #181c32;
+        }
+        .marketplace-header p {
+            color: #555;
+            font-size: 1.2rem;
+        }
+        .marketplace-search {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 32px;
+        }
+        .marketplace-search input {
+            width: 400px;
+            max-width: 90vw;
+            padding: 14px 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px 0 0 8px;
+            font-size: 1rem;
+        }
+        .marketplace-search button {
+            padding: 14px 24px;
+            border: none;
+            background: #181c32;
+            color: #fff;
+            border-radius: 0 8px 8px 0;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .marketplace-search button:hover {
+            background: #3366ff;
+        }
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            background: #f0f4ff;
+            color: #3366ff;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 18px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .category-btn.active, .category-btn:hover {
+            background: #3366ff;
+            color: #fff;
+        }
+        .goods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px;
+        }
+        .good-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            padding: 18px 16px 16px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            transition: box-shadow 0.2s;
+        }
+        .good-card:hover {
+            box-shadow: 0 4px 24px rgba(51,102,255,0.10);
+        }
+        .good-img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 14px;
+            background: #eaeaea;
+        }
+        .good-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #181c32;
+        }
+        .good-category {
+            font-size: 0.95rem;
+            color: #3366ff;
+            margin-bottom: 6px;
+        }
+        .good-desc {
+            font-size: 0.98rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .good-price {
+            color: #3366ff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        .good-actions {
+            margin-top: auto;
+            width: 100%;
+            display: flex;
+            gap: 10px;
+        }
+        .good-actions button {
+            flex: 1;
+            padding: 10px 0;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            background: #3366ff;
+            color: #fff;
+            transition: background 0.2s;
+        }
+        .good-actions button:hover {
+            background: #254edb;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.25);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            max-width: 420px;
+            width: 95vw;
+            padding: 32px 24px 24px 24px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.13);
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            font-size: 1.3rem;
+            color: #888;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .cart-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 18px;
+        }
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .cart-item-img {
+            width: 48px;
+            height: 48px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .cart-item-title {
+            flex: 1;
+            font-weight: 600;
+        }
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #e74c3c;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+        .cart-total {
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: right;
+        }
+        @media (max-width: 700px) {
+            .goods-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Highlighted good card */
+        .highlight-good {
+            animation: highlight-pulse 2s infinite;
+            border: 2px solid #3366ff;
+            position: relative;
+        }
+        
+        .highlight-good::before {
+            content: 'New Item!';
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #3366ff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            z-index: 1;
+        }
+        
+        @keyframes highlight-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(51, 102, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(51, 102, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(51, 102, 255, 0); }
+        }
+        
+        .good-seller {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 5px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="logo"><i class="fas fa-shopping-basket"></i> Horizon Mart</span>
+            <a href="index.html">Home</a>
+            <a href="marketplace.html" class="active">Marketplace</a>
+            <a href="advertise.html">Advertise</a>
+            <a href="messages.html">Messages</a>
+        </div>
+        <div class="nav-right">
+            <button class="cart-btn" id="cartBtn" title="View Cart">
+                <i class="fas fa-shopping-cart"></i>
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+            <button class="nav-btn nav-signin">Sign In</button>
+            <button class="nav-btn nav-join">Join Platform</button>
+        </div>
+    </nav>
+    <div class="marketplace-container">
+        <div class="marketplace-header">
+            <h1><i class="fas fa-store"></i> Digital Marketplace</h1>
+            <p>Discover a vast selection of goods and services, curated and suggested by AI for your needs.</p>
+        </div>
+        <form class="marketplace-search" onsubmit="event.preventDefault();">
+            <input type="text" id="searchInput" placeholder="Search for goods or services...">
+            <button type="submit"><i class="fas fa-search"></i> Search</button>
+        </form>
+        <div class="category-filter" id="categoryFilter"></div>
+        <div class="goods-grid" id="goodsGrid"></div>
+    </div>
+    <!-- Item Details Modal -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content" id="detailsContent">
+            <button class="modal-close" onclick="closeDetailsModal()"><i class="fas fa-times"></i></button>
+            <!-- Details will be injected here -->
+        </div>
+    </div>
+    <!-- Cart Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeCartModal()"><i class="fas fa-times"></i></button>
+            <h2><i class="fas fa-shopping-cart"></i> Your Cart</h2>
+            <div class="cart-list" id="cartList"></div>
+            <div class="cart-total" id="cartTotal"></div>
+            <button class="submit-button" style="width:100%;" onclick="window.location.href='checkout.html'">Checkout</button>
+        </div>
+    </div>
+    <script src="user-profile.js"></script>
+    <script>
+        // Load categories and goods
+        const categories = ["Books", "Courses", "Consulting", "Software", "Investments", "Legal", "Design", "Marketing", "Crypto", "Other"];
+        
+        // Default sample goods
+        const defaultGoods = [
+            { title: "AI Stock Trading Bot", desc: "Automate your trades with advanced AI algorithms.", price: 199.99, category: "Software", img: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80" },
+            { title: "Personal Finance eBook", desc: "Master your money with this comprehensive guide.", price: 14.99, category: "Books", img: "https://images.unsplash.com/photo-1516979187457-637abb4f9353?auto=format&fit=crop&w=400&q=80" },
+            { title: "1-on-1 Investment Consulting", desc: "Get expert advice tailored to your goals.", price: 99.00, category: "Consulting", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" },
+            { title: "Crypto Portfolio Tracker", desc: "Track and analyze your crypto assets in real time.", price: 29.99, category: "Software", img: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" },
+            { title: "Digital Marketing Course", desc: "Boost your business with modern marketing skills.", price: 59.99, category: "Courses", img: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80" },
+            { title: "Legal Contract Templates", desc: "Ready-to-use contracts for your business.", price: 24.99, category: "Legal", img: "https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?auto=format&fit=crop&w=400&q=80" },
+            { title: "UX/UI Design Audit", desc: "Improve your product with a professional design review.", price: 79.99, category: "Design", img: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80" },
+            { title: "Retirement Planning Guide", desc: "Plan your future with confidence.", price: 19.99, category: "Books", img: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" },
+            { title: "Business Incorporation Service", desc: "Start your business the right way.", price: 299.00, category: "Legal", img: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=400&q=80" },
+            { title: "SEO Optimization Toolkit", desc: "Increase your website's visibility.", price: 39.99, category: "Marketing", img: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=400&q=80" },
+        ];
+        
+        // Generate additional sample goods
+        for (let i = 0; i < 20; i++) {
+            const cat = categories[Math.floor(Math.random() * categories.length)];
+            defaultGoods.push({
+                title: `${cat} Service #${i+1}`,
+                desc: `AI-suggested ${cat.toLowerCase()} service to boost your success.`,
+                price: (Math.random() * 200 + 10).toFixed(2),
+                category: cat,
+                img: `https://source.unsplash.com/400x300/?${cat},business,finance,technology&sig=${i}`
+            });
+        }
+        
+        // Load user-advertised goods from localStorage
+        function loadMarketplaceGoods() {
+            return JSON.parse(localStorage.getItem('marketplaceGoods') || '[]');
+        }
+        
+        // Combine default goods with user-advertised goods
+        const userGoods = loadMarketplaceGoods();
+        const allGoods = [...userGoods, ...defaultGoods];
+        
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const sellerParam = urlParams.get('seller');
+        
+        // Set initial filtered goods based on URL parameters
+        let filteredGoods = allGoods;
+        let selectedCategory = 'All';
+        
+        // If seller parameter exists, filter by seller
+        if (sellerParam) {
+            filteredGoods = allGoods.filter(good => good.seller === sellerParam);
+            document.querySelector('.marketplace-header h1').innerHTML = `<i class="fas fa-store"></i> ${sellerParam}'s Goods`;
+            document.querySelector('.marketplace-header p').textContent = 'Viewing goods from this specific seller.';
+        }
+        // Cart logic
+        function getCart() {
+            return JSON.parse(localStorage.getItem('cart') || '[]');
+        }
+        function setCart(cart) {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+        function updateCartCount() {
+            document.getElementById('cartCount').textContent = getCart().length;
+        }
+        // Render category filter
+        function renderCategoryFilter() {
+            const filterDiv = document.getElementById('categoryFilter');
+            filterDiv.innerHTML = '';
+            const allBtn = document.createElement('button');
+            allBtn.className = 'category-btn' + (selectedCategory === 'All' ? ' active' : '');
+            allBtn.textContent = 'All';
+            allBtn.onclick = () => { selectedCategory = 'All'; filterGoods(); renderCategoryFilter(); };
+            filterDiv.appendChild(allBtn);
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'category-btn' + (selectedCategory === cat ? ' active' : '');
+                btn.textContent = cat;
+                btn.onclick = () => { selectedCategory = cat; filterGoods(); renderCategoryFilter(); };
+                filterDiv.appendChild(btn);
+            });
+        }
+        // Render goods
+        function renderGoods(goods) {
+            const goodsGrid = document.getElementById('goodsGrid');
+            
+            // Get the highlighted good ID from URL if present
+            const urlParams = new URLSearchParams(window.location.search);
+            const highlightGoodId = urlParams.get('highlight');
+            
+            if (goods.length === 0) {
+                goodsGrid.innerHTML = '<p style="grid-column:1/-1;text-align:center;color:#888;">No goods or services found.</p>';
+                return;
+            }
+            
+            goodsGrid.innerHTML = '';
+            
+            goods.forEach((good, idx) => {
+                const goodCard = document.createElement('div');
+                goodCard.className = 'good-card';
+                
+                // Add highlight class if this is the newly added good
+                if (highlightGoodId && good.id && good.id.toString() === highlightGoodId) {
+                    goodCard.className += ' highlight-good';
+                }
+                
+                // Add seller info if available
+                const sellerInfo = good.seller ? 
+                    `<div class="good-seller">Seller: ${good.seller.split('@')[0]}</div>` : '';
+                
+                goodCard.innerHTML = `
+                    <img class="good-img" src="${good.img || 'assets/placeholder.png'}" alt="${good.title}">
+                    <div class="good-title">${good.title}</div>
+                    <div class="good-category">${good.category}</div>
+                    <div class="good-desc">${good.desc}</div>
+                    ${sellerInfo}
+                    <div class="good-price">$${good.price}</div>
+                    <div class="good-actions">
+                        <button onclick="addToCart(${idx})"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                        <button onclick="showDetailsModal(${idx})"><i class="fas fa-info-circle"></i> View Details</button>
+                    </div>
+                `;
+                
+                goodsGrid.appendChild(goodCard);
+                
+                // Scroll to highlighted good
+                if (highlightGoodId && good.id && good.id.toString() === highlightGoodId) {
+                    setTimeout(() => {
+                        goodCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 500);
+                }
+             });
+         }
+        // Filter goods
+        function filterGoods() {
+            const q = document.getElementById('searchInput').value.trim().toLowerCase();
+            
+            // Start with all goods or seller-specific goods
+            let baseGoods = allGoods;
+            if (sellerParam) {
+                baseGoods = allGoods.filter(good => good.seller === sellerParam);
+            }
+            
+            // Apply category and search filters
+            filteredGoods = baseGoods.filter(good =>
+                (selectedCategory === 'All' || good.category === selectedCategory) &&
+                (good.title?.toLowerCase().includes(q) ||
+                good.desc?.toLowerCase().includes(q) ||
+                good.category?.toLowerCase().includes(q))
+            );
+            
+            renderGoods(filteredGoods);
+            
+            // Update seller info if viewing seller's goods
+            if (sellerParam && filteredGoods.length === 0) {
+                document.querySelector('.marketplace-header p').textContent = 'No goods found from this seller with the current filters.';
+            } else if (sellerParam) {
+                document.querySelector('.marketplace-header p').textContent = `Viewing ${filteredGoods.length} goods from this seller.`;
+            }
+        }
+        // Add to cart
+        window.addToCart = function(idx) {
+            const good = filteredGoods[idx];
+            if (good) {
+                const cart = getCart();
+                // Check if item already exists in cart
+                const existingItem = cart.find(item => item.id === good.id || (item.title === good.title && item.price === good.price));
+                if (existingItem) {
+                    alert('This item is already in your cart!');
+                    return;
+                }
+                cart.push(good);
+                setCart(cart);
+                
+                // Show success feedback
+                const button = event.target.closest('button');
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-check"></i> Added!';
+                button.style.backgroundColor = '#28a745';
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.backgroundColor = '';
+                }, 2000);
+            } else {
+                alert('Error: Item not found!');
+            }
+        };
+        // Show details modal
+        window.showDetailsModal = function(idx) {
+            const good = filteredGoods[idx];
+            const modal = document.getElementById('detailsModal');
+            const content = document.getElementById('detailsContent');
+            content.innerHTML = `
+                <button class="modal-close" onclick="closeDetailsModal()"><i class="fas fa-times"></i></button>
+                <img class="good-img" src="${good.img || 'assets/placeholder.png'}" alt="${good.title}" style="margin-bottom:18px;">
+                <div class="good-title" style="font-size:1.3rem;">${good.title}</div>
+                <div class="good-category">${good.category}</div>
+                <div class="good-desc" style="margin-bottom:14px;">${good.desc}</div>
+                <div class="good-price" style="font-size:1.2rem;">$${good.price}</div>
+                <button class="submit-button" style="width:100%;margin-top:18px;" onclick="addToCartFromModal(${idx})"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+            `;
+            modal.classList.add('show');
+        };
+        window.closeDetailsModal = function() {
+            document.getElementById('detailsModal').classList.remove('show');
+        };
+        // Add to cart from modal
+        window.addToCartFromModal = function(idx) {
+            const good = filteredGoods[idx];
+            if (good) {
+                const cart = getCart();
+                cart.push(good);
+                setCart(cart);
+                alert('Added to cart!');
+                closeDetailsModal();
+            } else {
+                alert('Error: Item not found!');
+            }
+        };
+        // Cart modal logic
+        document.getElementById('cartBtn').onclick = function() {
+            renderCart();
+            document.getElementById('cartModal').classList.add('show');
+        };
+        window.closeCartModal = function() {
+            document.getElementById('cartModal').classList.remove('show');
+        };
+        function renderCart() {
+            const cart = getCart();
+            const cartList = document.getElementById('cartList');
+            const cartTotal = document.getElementById('cartTotal');
+            if (cart.length === 0) {
+                cartList.innerHTML = '<p style="color:#888;text-align:center;">Your cart is empty.</p>';
+                cartTotal.textContent = '';
+                return;
+            }
+            let total = 0;
+            cartList.innerHTML = cart.map((item, idx) => {
+                total += parseFloat(item.price);
+                return `
+                    <div class="cart-item">
+                        <img class="cart-item-img" src="${item.img}" alt="${item.title}">
+                        <div class="cart-item-title">${item.title}</div>
+                        <div class="good-price">$${item.price}</div>
+                        <button class="cart-item-remove" onclick="removeFromCart(${idx})"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+            }).join('');
+            cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+        }
+        window.removeFromCart = function(idx) {
+            const cart = getCart();
+            cart.splice(idx, 1);
+            setCart(cart);
+            renderCart();
+        };
+        // Add My Goods button to navigation if user is logged in
+        function addMyGoodsButton() {
+            const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+            if (userData.email) {
+                const navRight = document.querySelector('.nav-right');
+                const cartBtn = document.getElementById('cartBtn');
+                
+                // Create My Goods button
+                const myGoodsBtn = document.createElement('button');
+                myGoodsBtn.className = 'nav-btn nav-signin';
+                myGoodsBtn.innerHTML = '<i class="fas fa-box"></i> My Goods';
+                myGoodsBtn.onclick = () => {
+                    window.location.href = `marketplace.html?seller=${encodeURIComponent(userData.email)}`;
+                };
+                
+                // Insert before cart button
+                navRight.insertBefore(myGoodsBtn, cartBtn);
+            }
+        }
+        
+        // Initialize user profile if available
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof updateUserNavigation === 'function') {
+                updateUserNavigation();
+            }
+        });
+        
+        // Initial render
+        renderCategoryFilter();
+        renderGoods(filteredGoods);
+        updateCartCount();
+        addMyGoodsButton();
+        document.getElementById('searchInput').addEventListener('input', filterGoods);
+    </script>
+</body>
+</html>
+<!--NEEDS TO SHOW ADVERTISED GOODS-->

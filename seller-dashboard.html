@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard - Financs Together</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+        .error, .success {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            display: none;
+            z-index: 1000;
+        }
+        .error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        .success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Loading Overlay -->
+    <div id="loading" class="loading">
+        <div class="loading-content">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+            <p class="mt-4 text-gray-700">Loading...</p>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error" class="error"></div>
+
+    <!-- Success Message -->
+    <div id="success" class="success"></div>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <h1 class="text-xl font-bold text-gray-800">Financs Together</h1>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <button onclick="window.location.href='index.html'" class="text-gray-600 hover:text-gray-900">
+                        Back to Home
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <!-- Stats Section -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">Total Listings</dt>
+                    <dd id="totalListings" class="mt-1 text-3xl font-semibold text-gray-900">-</dd>
+                </div>
+            </div>
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">Premium Listings</dt>
+                    <dd id="premiumListings" class="mt-1 text-3xl font-semibold text-gray-900">-</dd>
+                </div>
+            </div>
+            <div class="bg-white overflow-hidden shadow rounded-lg">
+                <div class="px-4 py-5 sm:p-6">
+                    <dt class="text-sm font-medium text-gray-500 truncate">Active Premium Listings</dt>
+                    <dd id="activePremiumListings" class="mt-1 text-3xl font-semibold text-gray-900">-</dd>
+                </div>
+            </div>
+        </div>
+
+        <!-- Listings Section -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-medium text-gray-900">Your Listings</h2>
+                    <button onclick="showAddListingModal()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                        Add New Listing
+                    </button>
+                </div>
+                <div id="listingsList" class="space-y-4">
+                    <!-- Listings will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add/Edit Listing Modal -->
+    <div id="listingModal" class="fixed inset-0 bg-gray-500 bg-opacity-75 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full">
+                <div class="px-4 py-5 sm:p-6">
+                    <h3 id="modalTitle" class="text-lg font-medium text-gray-900 mb-4">Add New Listing</h3>
+                    <form id="listingForm" onsubmit="handleListingSubmit(event)">
+                        <input type="hidden" id="listingId">
+                        <div class="space-y-4">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                                <input type="text" id="name" name="name" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                                <textarea id="description" name="description" rows="3" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"></textarea>
+                            </div>
+                            <div>
+                                <label for="price" class="block text-sm font-medium text-gray-700">Price</label>
+                                <input type="number" id="price" name="price" step="0.01" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                            </div>
+                            <div>
+                                <label for="category" class="block text-sm font-medium text-gray-700">Category</label>
+                                <select id="category" name="category" required
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                                    <option value="">Select a category</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="clothing">Clothing</option>
+                                    <option value="home">Home & Garden</option>
+                                    <option value="sports">Sports & Outdoors</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex justify-end space-x-3">
+                            <button type="button" onclick="hideListingModal()"
+                                class="bg-gray-100 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-200">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+                                Save
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="user-profile.js"></script>
+    <script>
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            loadListings();
+            loadPremiumStats();
+        });
+
+        async function loadListings() {
+            try {
+                showLoading('Loading listings...');
+                const response = await fetch('/api/seller/listings');
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.details || error.error || 'Failed to load listings');
+                }
+                const listings = await response.json();
+                displayListings(listings);
+            } catch (error) {
+                console.error('Error loading listings:', error);
+                showError('Failed to load listings: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayListings(listings) {
+            const listingsList = document.getElementById('listingsList');
+            listingsList.innerHTML = listings.map(listing => `
+                <div class="border rounded-lg p-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-lg font-medium text-gray-900">${listing.name}</h3>
+                            <p class="mt-1 text-sm text-gray-500">${listing.description}</p>
+                            <div class="mt-2 flex items-center space-x-4">
+                                <span class="text-sm font-medium text-gray-900">$${listing.price}</span>
+                                <span class="text-sm text-gray-500">${listing.category}</span>
+                                ${listing.isPremium ? `
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Premium
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editListing('${listing._id}')"
+                                class="text-blue-600 hover:text-blue-900">
+                                Edit
+                            </button>
+                            <button onclick="deleteListing('${listing._id}')"
+                                class="text-red-600 hover:text-red-900">
+                                Delete
+                            </button>
+                            <button onclick="togglePremiumStatus('${listing._id}', ${!listing.isPremium})"
+                                class="text-yellow-600 hover:text-yellow-900">
+                                ${listing.isPremium ? 'Remove Premium' : 'Make Premium'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function createListing(formData) {
+            try {
+                showLoading('Creating listing...');
+                const response = await fetch('/api/seller/listings', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.details || error.error || 'Failed to create listing');
+                }
+
+                const newListing = await response.json();
+                showSuccess('Listing created successfully!');
+                await loadListings();
+                return newListing;
+            } catch (error) {
+                console.error('Error creating listing:', error);
+                showError('Failed to create listing: ' + error.message);
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function updateListing(id, formData) {
+            try {
+                showLoading('Updating listing...');
+                const response = await fetch(`/api/seller/listings/${id}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.details || error.error || 'Failed to update listing');
+                }
+
+                const updatedListing = await response.json();
+                showSuccess('Listing updated successfully!');
+                await loadListings();
+                return updatedListing;
+            } catch (error) {
+                console.error('Error updating listing:', error);
+                showError('Failed to update listing: ' + error.message);
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function deleteListing(id) {
+            if (!confirm('Are you sure you want to delete this listing?')) {
+                return;
+            }
+
+            try {
+                showLoading('Deleting listing...');
+                const response = await fetch(`/api/seller/listings/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.details || error.error || 'Failed to delete listing');
+                }
+
+                showSuccess('Listing deleted successfully!');
+                await loadListings();
+            } catch (error) {
+                console.error('Error deleting listing:', error);
+                showError('Failed to delete listing: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function togglePremiumStatus(id, isPremium) {
+            try {
+                showLoading(isPremium ? 'Upgrading to premium...' : 'Removing premium status...');
+                const response = await fetch(`/api/seller/listings/${id}/premium`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isPremium })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.details || error.error || 'Failed to update premium status');
+                }
+
+                const updatedListing = await response.json();
+                showSuccess(isPremium ? 'Listing upgraded to premium!' : 'Premium status removed!');
+                await loadListings();
+                return updatedListing;
+            } catch (error) {
+                console.error('Error updating premium status:', error);
+                showError('Failed to update premium status: ' + error.message);
+                throw error;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function loadPremiumStats() {
+            try {
+                showLoading('Loading premium statistics...');
+                const response = await fetch('/api/seller/premium-stats');
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.details || error.error || 'Failed to load premium statistics');
+                }
+                const stats = await response.json();
+                updatePremiumStats(stats);
+            } catch (error) {
+                console.error('Error loading premium statistics:', error);
+                showError('Failed to load premium statistics: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function updatePremiumStats(stats) {
+            document.getElementById('totalListings').textContent = stats.totalListings;
+            document.getElementById('premiumListings').textContent = stats.premiumListings;
+            document.getElementById('activePremiumListings').textContent = stats.activePremiumListings;
+        }
+
+        function showLoading(message) {
+            const loadingEl = document.getElementById('loading');
+            if (loadingEl) {
+                loadingEl.querySelector('p').textContent = message;
+                loadingEl.style.display = 'flex';
+            }
+        }
+
+        function hideLoading() {
+            const loadingEl = document.getElementById('loading');
+            if (loadingEl) {
+                loadingEl.style.display = 'none';
+            }
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('error');
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.style.display = 'block';
+                setTimeout(() => {
+                    errorEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showSuccess(message) {
+            const successEl = document.getElementById('success');
+            if (successEl) {
+                successEl.textContent = message;
+                successEl.style.display = 'block';
+                setTimeout(() => {
+                    successEl.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function showAddListingModal() {
+            document.getElementById('modalTitle').textContent = 'Add New Listing';
+            document.getElementById('listingId').value = '';
+            document.getElementById('listingForm').reset();
+            document.getElementById('listingModal').classList.remove('hidden');
+        }
+
+        function hideListingModal() {
+            document.getElementById('listingModal').classList.add('hidden');
+        }
+
+        async function editListing(id) {
+            try {
+                showLoading('Loading listing details...');
+                const response = await fetch(`/api/seller/listings/${id}`);
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.details || error.error || 'Failed to load listing details');
+                }
+                const listing = await response.json();
+                
+                document.getElementById('modalTitle').textContent = 'Edit Listing';
+                document.getElementById('listingId').value = listing._id;
+                document.getElementById('name').value = listing.name;
+                document.getElementById('description').value = listing.description;
+                document.getElementById('price').value = listing.price;
+                document.getElementById('category').value = listing.category;
+                
+                document.getElementById('listingModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading listing details:', error);
+                showError('Failed to load listing details: ' + error.message);
+            } finally {
+                hideLoading();
+            }
+        }
+
+        async function handleListingSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const formData = new FormData(form);
+            const listingId = document.getElementById('listingId').value;
+
+            try {
+                if (listingId) {
+                    await updateListing(listingId, formData);
+                } else {
+                    await createListing(formData);
+                }
+                hideListingModal();
+            } catch (error) {
+                // Error is already handled in createListing/updateListing
+                console.error('Error handling listing submission:', error);
+            }
+        }
+    </script>
+</body>
+</html>

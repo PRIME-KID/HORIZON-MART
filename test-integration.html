@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        h1 {
+            color: #333;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .test-controls {
+            margin: 15px 0;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .test-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .test-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Backend-Frontend Integration Test</h1>
+        
+        <h2>1. Server Status</h2>
+        <div id="server-status" class="status">Checking server status...</div>
+        
+        <h2>2. Payment Integration</h2>
+        <div id="payment-status" class="status">Checking payment integration...</div>
+        
+        <h2>3. Response Data</h2>
+        <pre id="response-data">No data yet</pre>
+        
+        <h2>4. Test Additional Endpoints</h2>
+        <div class="test-controls">
+            <button id="test-confirm-payment" class="test-button">Test Confirm Payment</button>
+            <button id="test-invalid-amount" class="test-button">Test Invalid Amount</button>
+            <button id="test-invalid-currency" class="test-button">Test Invalid Currency</button>
+        </div>
+        <div id="additional-test-status" class="status">No additional tests run yet</div>
+        <pre id="additional-test-data">No data yet</pre>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const serverStatus = document.getElementById('server-status');
+            const paymentStatus = document.getElementById('payment-status');
+            const responseData = document.getElementById('response-data');
+            const additionalTestStatus = document.getElementById('additional-test-status');
+            const additionalTestData = document.getElementById('additional-test-data');
+            
+            // Test buttons
+            const testConfirmPaymentBtn = document.getElementById('test-confirm-payment');
+            const testInvalidAmountBtn = document.getElementById('test-invalid-amount');
+            const testInvalidCurrencyBtn = document.getElementById('test-invalid-currency');
+            
+            // Store payment intent ID for confirm payment test
+            let paymentIntentId = null;
+            
+            // Test server connection
+            try {
+                const response = await fetch('http://localhost:3002/create-payment-intent', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        amount: 10.00,
+                        currency: 'usd'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    serverStatus.textContent = 'Server is running and responding!';
+                    serverStatus.classList.add('success');
+                    
+                    // Store payment intent ID for later use
+                    paymentIntentId = data.id;
+                    
+                    // Check payment integration
+                    if (data.clientSecret && data.id) {
+                        paymentStatus.textContent = 'Payment integration is working correctly!';
+                        paymentStatus.classList.add('success');
+                        responseData.textContent = JSON.stringify(data, null, 2);
+                    } else {
+                        paymentStatus.textContent = 'Payment integration response is missing required fields.';
+                        paymentStatus.classList.add('error');
+                        responseData.textContent = JSON.stringify(data, null, 2);
+                    }
+                } else {
+                    const errorData = await response.json();
+                    serverStatus.textContent = 'Server responded with an error.';
+                    serverStatus.classList.add('error');
+                    responseData.textContent = JSON.stringify(errorData, null, 2);
+                }
+            } catch (error) {
+                serverStatus.textContent = 'Could not connect to server. Make sure it\'s running on port 3002.';
+                serverStatus.classList.add('error');
+                paymentStatus.textContent = 'Payment integration could not be tested due to server connection issues.';
+                paymentStatus.classList.add('error');
+                responseData.textContent = error.toString();
+            }
+            
+            // Test confirm payment
+            testConfirmPaymentBtn.addEventListener('click', async () => {
+                additionalTestStatus.textContent = 'Testing confirm payment...';
+                additionalTestStatus.className = 'status';
+                
+                try {
+                    if (!paymentIntentId) {
+                        throw new Error('No payment intent ID available. Run the initial test first.');
+                    }
+                    
+                    const response = await fetch('http://localhost:3002/confirm-payment', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            paymentIntentId: paymentIntentId
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        additionalTestStatus.textContent = 'Confirm payment test successful!';
+                        additionalTestStatus.classList.add('success');
+                    } else {
+                        additionalTestStatus.textContent = 'Confirm payment test failed.';
+                        additionalTestStatus.classList.add('error');
+                    }
+                    
+                    additionalTestData.textContent = JSON.stringify(data, null, 2);
+                } catch (error) {
+                    additionalTestStatus.textContent = 'Error testing confirm payment: ' + error.message;
+                    additionalTestStatus.classList.add('error');
+                    additionalTestData.textContent = error.toString();
+                }
+            });
+            
+            // Test invalid amount
+            testInvalidAmountBtn.addEventListener('click', async () => {
+                additionalTestStatus.textContent = 'Testing invalid amount...';
+                additionalTestStatus.className = 'status';
+                
+                try {
+                    const response = await fetch('http://localhost:3002/create-payment-intent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            amount: -10.00, // Invalid negative amount
+                            currency: 'usd'
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok && data.error) {
+                        additionalTestStatus.textContent = 'Invalid amount test successful (error detected as expected)!';
+                        additionalTestStatus.classList.add('success');
+                    } else {
+                        additionalTestStatus.textContent = 'Invalid amount test failed (server accepted invalid amount).';
+                        additionalTestStatus.classList.add('error');
+                    }
+                    
+                    additionalTestData.textContent = JSON.stringify(data, null, 2);
+                } catch (error) {
+                    additionalTestStatus.textContent = 'Error testing invalid amount: ' + error.message;
+                    additionalTestStatus.classList.add('error');
+                    additionalTestData.textContent = error.toString();
+                }
+            });
+            
+            // Test invalid currency
+            testInvalidCurrencyBtn.addEventListener('click', async () => {
+                additionalTestStatus.textContent = 'Testing invalid currency...';
+                additionalTestStatus.className = 'status';
+                
+                try {
+                    const response = await fetch('http://localhost:3002/create-payment-intent', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            amount: 10.00,
+                            currency: 'invalid_currency' // Invalid currency
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok && data.error) {
+                        additionalTestStatus.textContent = 'Invalid currency test successful (error detected as expected)!';
+                        additionalTestStatus.classList.add('success');
+                    } else {
+                        additionalTestStatus.textContent = 'Invalid currency test failed (server accepted invalid currency).';
+                        additionalTestStatus.classList.add('error');
+                    }
+                    
+                    additionalTestData.textContent = JSON.stringify(data, null, 2);
+                } catch (error) {
+                    additionalTestStatus.textContent = 'Error testing invalid currency: ' + error.message;
+                    additionalTestStatus.classList.add('error');
+                    additionalTestData.textContent = error.toString();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

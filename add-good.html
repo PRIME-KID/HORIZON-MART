@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Good | Horizon Mart</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .form-group textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        .image-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .image-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .preview-item {
+            position: relative;
+            aspect-ratio: 1;
+        }
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        .preview-item .remove {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+        }
+        .commission-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        .submit-btn {
+            background: #3366ff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+        .submit-btn:hover {
+            background: #254edb;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="logo"><i class="fas fa-shopping-basket"></i> Horizon Mart</span>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="seller-dashboard.html">Seller Dashboard</a>
+            <a href="messages.html">Messages</a>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn nav-signin">Sign In</button>
+            <button class="nav-btn nav-join">Join Platform</button>
+        </div>
+    </nav>
+
+    <div class="form-container">
+        <h1>Add New Good</h1>
+        <p class="commission-info" style="background: #e6f7ff; color: #0066cc; padding: 10px 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500; border-left: 4px solid #0066cc;"><i class="fas fa-info-circle"></i> Only 1% commission on all goods sold through our platform!</p>
+        <form id="addGoodForm">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" name="title" required>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category" required onchange="updateCommissionRate()">
+                    <option value="">Select category</option>
+                    <option value="general">General Marketplace</option>
+                    <option value="premium">Premium/Curated</option>
+                    <option value="services">Services</option>
+                    <option value="digital">Digital Goods</option>
+                    <option value="high-volume">High Volume/Low Margin</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input type="number" id="price" name="price" min="0.01" step="0.01" required onchange="updateCommissionRate()">
+            </div>
+
+            <div class="form-group">
+                <label>Images</label>
+                <div class="image-upload" onclick="document.getElementById('imageInput').click()">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <p>Click to upload images</p>
+                    <input type="file" id="imageInput" multiple accept="image/*" style="display: none" onchange="handleImageUpload(event)">
+                </div>
+                <div class="image-preview" id="imagePreview"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Contact Information</label>
+                <input type="email" name="contactEmail" placeholder="Contact Email" required>
+                <input type="tel" name="contactPhone" placeholder="Contact Phone" required>
+                <input type="url" name="contactWebsite" placeholder="Website (optional)">
+            </div>
+
+            <div class="commission-preview" id="commissionPreview">
+                <h3>Commission Preview</h3>
+                <p>Category: <span id="categoryDisplay">-</span></p>
+                <p>Commission Rate: <span id="commissionRate">-</span></p>
+                <p>Commission Amount: <span id="commissionAmount">-</span></p>
+                <p>Your Earnings: <span id="sellerAmount">-</span></p>
+            </div>
+
+            <button type="submit" class="submit-btn">Add Good</button>
+        </form>
+    </div>
+
+    <script src="user-profile.js"></script>
+    <script>
+        const COMMISSION_RATES = {
+            'general': 0.01,
+            'premium': 0.01,
+            'services': 0.01,
+            'digital': 0.01,
+            'high-volume': 0.01
+        };
+
+        function updateCommissionRate() {
+            const category = document.getElementById('category').value;
+            const price = parseFloat(document.getElementById('price').value) || 0;
+            
+            if (category && price > 0) {
+                const rate = COMMISSION_RATES[category];
+                const commission = price * rate;
+                const sellerAmount = price - commission;
+
+                document.getElementById('categoryDisplay').textContent = 
+                    document.getElementById('category').options[document.getElementById('category').selectedIndex].text;
+                document.getElementById('commissionRate').textContent = `${(rate * 100).toFixed(1)}%`;
+                document.getElementById('commissionAmount').textContent = `$${commission.toFixed(2)}`;
+                document.getElementById('sellerAmount').textContent = `$${sellerAmount.toFixed(2)}`;
+            }
+        }
+
+        function handleImageUpload(event) {
+            const files = event.target.files;
+            const preview = document.getElementById('imagePreview');
+            
+            for (let file of files) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const div = document.createElement('div');
+                        div.className = 'preview-item';
+                        div.innerHTML = `
+                            <img src="${e.target.result}" alt="Preview">
+                            <button class="remove" onclick="this.parentElement.remove()">×</button>
+                        `;
+                        preview.appendChild(div);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            }
+        }
+
+        document.getElementById('addGoodForm').onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = this.querySelector('.submit-btn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Adding Good...';
+            
+            try {
+                const formData = new FormData(this);
+                const data = {
+                    title: formData.get('title'),
+                    description: formData.get('description'),
+                    category: formData.get('category'),
+                    price: parseFloat(formData.get('price')),
+                    contactInfo: {
+                        email: formData.get('contactEmail'),
+                        phone: formData.get('contactPhone'),
+                        website: formData.get('contactWebsite')
+                    }
+                };
+
+                // Validate data
+                if (!data.title || !data.description || !data.category || !data.price) {
+                    throw new Error('Please fill in all required fields');
+                }
+
+                const response = await fetch('http://localhost:3002/api/seller/goods', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert('Good added successfully!');
+                    window.location.href = 'seller-dashboard.html';
+                } else {
+                    throw new Error(result.error || 'Failed to add good');
+                }
+            } catch (error) {
+                alert(error.message || 'Network error. Please try again.');
+                console.error('Error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Add Good';
+            }
+        };
+    </script>
+</body>
+</html>

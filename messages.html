@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Messages | Horizon Mart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #3366ff;
+            --bg: #f5f8ff;
+            --sidebar-bg: #fff;
+            --chat-bg: #fff;
+            --text: #181c32;
+            --input-bg: #f0f4ff;
+            --border: #e0e0e0;
+        }
+        body.dark {
+            --primary: #3366ff;
+            --bg: #181c32;
+            --sidebar-bg: #23263a;
+            --chat-bg: #23263a;
+            --text: #f5f8ff;
+            --input-bg: #23263a;
+            --border: #33374d;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+        .navbar {
+            background: var(--sidebar-bg);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+        }
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .nav-left a {
+            color: var(--text);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .nav-right {
+            display: flex;
+            gap: 1rem;
+        }
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .nav-signin {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+        .nav-join {
+            background: var(--primary);
+            color: white;
+        }
+        .messaging-container {
+            display: flex;
+            height: calc(100vh - 70px);
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--sidebar-bg);
+        }
+        .sidebar {
+            width: 320px;
+            background: var(--sidebar-bg);
+            border-right: 1.5px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header {
+            padding: 24px 20px 12px 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-bar {
+            padding: 0 20px 20px 20px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text);
+        }
+        .user-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 10px 10px 10px;
+        }
+        .user-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 6px;
+            transition: background 0.2s;
+            color: var(--text);
+        }
+        .user-list-item.active, .user-list-item:hover {
+            background: var(--input-bg);
+        }
+        .user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--primary);
+            font-weight: 700;
+        }
+        .user-info {
+            flex: 1;
+        }
+        .user-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .user-details {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .user-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+        .user-status.online {
+            background: #4CAF50;
+        }
+        .chat-section {
+            flex: 1;
+            background: var(--chat-bg);
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 20px 28px;
+            border-bottom: 1.5px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .chat-header-right {
+            display: flex;
+            gap: 15px;
+        }
+        .call-btn {
+            background: var(--input-bg);
+            color: var(--primary);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .call-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 24px 28px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        .message {
+            max-width: 60%;
+            padding: 12px 18px;
+            border-radius: 16px;
+            font-size: 1rem;
+            line-height: 1.5;
+            background: var(--input-bg);
+            color: var(--text);
+            align-self: flex-start;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+        }
+        .message.me {
+            background: var(--primary);
+            color: #fff;
+            align-self: flex-end;
+        }
+        .chat-input-section {
+            padding: 18px 28px;
+            border-top: 1.5px solid var(--border);
+            background: var(--chat-bg);
+            display: flex;
+            gap: 12px;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            font-size: 1rem;
+            background: var(--input-bg);
+            color: var(--text);
+            outline: none;
+        }
+        .send-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 0 22px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .send-btn:hover {
+            background: #254edb;
+        }
+        .mode-toggle {
+            position: absolute;
+            top: 18px;
+            right: 32px;
+            background: var(--input-bg);
+            color: var(--primary);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: background 0.2s, color 0.2s;
+        }
+        .mode-toggle:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        .add-user-btn {
+            position: absolute;
+            top: 18px;
+            right: 80px;
+            background: var(--input-bg);
+            color: var(--primary);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+            transition: background 0.2s, color 0.2s;
+        }
+        .add-user-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        @media (max-width: 900px) {
+            .messaging-container {
+                flex-direction: column;
+                height: auto;
+                min-height: 100vh;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1.5px solid var(--border);
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="logo"><i class="fas fa-shopping-basket"></i> Horizon Mart</span>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="seller-dashboard.html">Sellers</a>
+            <a href="ai-insights.html">AI Insights</a>
+            <a href="messages.html" class="active">Messages</a>
+            <a href="advertise.html">Advertise</a>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn nav-signin" onclick="window.location.href='signup.html'">Sign in</button>
+            <button class="nav-btn nav-join" onclick="window.location.href='signup.html'">Join Platform</button>
+        </div>
+    </nav>
+
+    <button class="mode-toggle" id="modeToggle" title="Toggle dark/light mode"><i class="fas fa-moon"></i></button>
+    <button class="add-user-btn" id="addUserBtn" title="Add new contact"><i class="fas fa-user-plus"></i></button>
+
+    <div class="messaging-container">
+        <div class="sidebar">
+            <div class="sidebar-header"><i class="fas fa-comments"></i> Messages</div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search contacts..." id="searchContacts">
+            </div>
+            <div class="user-list" id="userList"></div>
+        </div>
+        <div class="chat-section">
+            <div class="chat-header" id="chatHeader">
+                <div class="chat-header-left">
+                    <span class="user-avatar">S</span>
+                    <div class="user-info">
+                        <div class="user-name">Select a contact</div>
+                        <div class="user-details">Click on a contact to start chatting</div>
+                    </div>
+                </div>
+                <div class="chat-header-right" style="display: none;">
+                    <button class="call-btn" title="Voice Call"><i class="fas fa-phone"></i></button>
+                    <button class="call-btn" title="Video Call"><i class="fas fa-video"></i></button>
+                </div>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <form class="chat-input-section" id="chatForm" style="display:none;">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Type your message..." autocomplete="off" required>
+                <button type="submit" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://sdk.twilio.com/js/video/releases/2.24.0/twilio-video.min.js"></script>
+    <script src="user-profile.js"></script>
+    <script>
+        // Demo users with enhanced information
+        const users = [
+            {
+                id: 'u1',
+                name: 'John Smith',
+                avatar: 'J',
+                phone: '+1 (555) 123-4567',
+                business: 'Financial Advisor',
+                service: 'Investment Consulting',
+                status: 'online'
+            },
+            {
+                id: 'u2',
+                name: 'Sarah Johnson',
+                avatar: 'S',
+                phone: '+1 (555) 234-5678',
+                business: 'Trading Expert',
+                service: 'Market Analysis',
+                status: 'offline'
+            },
+            {
+                id: 'u3',
+                name: 'Michael Chen',
+                avatar: 'M',
+                phone: '+1 (555) 345-6789',
+                business: 'Crypto Trader',
+                service: 'Digital Assets',
+                status: 'online'
+            }
+        ];
+
+        let currentUser = users[0];
+        let chatWith = null;
+        let chats = {};
+        let activeRoom = null;
+        let localVideoTrack = null;
+
+        // Dark/Light mode
+        const modeToggle = document.getElementById('modeToggle');
+        modeToggle.onclick = function() {
+            document.body.classList.toggle('dark');
+            modeToggle.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        };
+
+        // Search functionality
+        const searchInput = document.getElementById('searchContacts');
+        searchInput.oninput = function() {
+            const searchTerm = this.value.toLowerCase();
+            const filteredUsers = users.filter(user => 
+                user.name.toLowerCase().includes(searchTerm) ||
+                user.business.toLowerCase().includes(searchTerm) ||
+                user.service.toLowerCase().includes(searchTerm)
+            );
+            renderUserList(filteredUsers);
+        };
+
+        // Render user list
+        function renderUserList(usersToRender = users) {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            usersToRender.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'user-list-item';
+                div.innerHTML = `
+                    <span class="user-avatar">${user.avatar}</span>
+                    <div class="user-info">
+                        <div class="user-name">${user.name}</div>
+                        <div class="user-details">${user.business} - ${user.service}</div>
+                    </div>
+                    <span class="user-status ${user.status}"></span>
+                `;
+                div.onclick = () => selectChat(user);
+                if (chatWith && chatWith.id === user.id) div.classList.add('active');
+                userList.appendChild(div);
+            });
+        }
+
+        // Select chat
+        function selectChat(user) {
+            chatWith = user;
+            const chatHeader = document.getElementById('chatHeader');
+            chatHeader.innerHTML = `
+                <div class="chat-header-left">
+                    <span class="user-avatar">${user.avatar}</span>
+                    <div class="user-info">
+                        <div class="user-name">${user.name}</div>
+                        <div class="user-details">${user.business} - ${user.service}</div>
+                    </div>
+                </div>
+                <div class="chat-header-right">
+                    <button class="call-btn" title="Voice Call" onclick="initiateCall('voice')"><i class="fas fa-phone"></i></button>
+                    <button class="call-btn" title="Video Call" onclick="initiateCall('video')"><i class="fas fa-video"></i></button>
+                </div>
+            `;
+            document.getElementById('chatForm').style.display = 'flex';
+            renderMessages();
+        }
+
+        // Call handling
+        async function initiateCall(type) {
+            if (!chatWith) return;
+
+            try {
+                // Generate a unique room name
+                const roomName = `room-${currentUser.id}-${chatWith.id}-${Date.now()}`;
+                
+                // Get token from server
+                const tokenResponse = await fetch('http://localhost:3002/api/token', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        identity: currentUser.id,
+                        roomName: roomName
+                    })
+                });
+                
+                const { token } = await tokenResponse.json();
+
+                // Initialize call based on type
+                const callResponse = await fetch(`http://localhost:3002/api/call/${type}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        identity: currentUser.id,
+                        roomName: roomName
+                    })
+                });
+
+                const { roomSid } = await callResponse.json();
+
+                // Connect to the room
+                activeRoom = await Twilio.Video.connect(token, {
+                    name: roomName,
+                    audio: true,
+                    video: type === 'video'
+                });
+
+                // Create call UI
+                createCallUI(type);
+
+                // Handle participant connection
+                activeRoom.on('participantConnected', participant => {
+                    console.log('Participant connected:', participant.identity);
+                    if (type === 'video') {
+                        participant.tracks.forEach(publication => {
+                            if (publication.kind === 'video') {
+                                const videoElement = document.getElementById('remoteVideo');
+                                publication.track.attach(videoElement);
+                            }
+                        });
+                    }
+                });
+
+                // Handle participant disconnection
+                activeRoom.on('participantDisconnected', participant => {
+                    console.log('Participant disconnected:', participant.identity);
+                    endCall();
+                });
+
+            } catch (error) {
+                console.error('Error initiating call:', error);
+                alert('Failed to initiate call. Please try again.');
+            }
+        }
+
+        function createCallUI(type) {
+            // Create call container
+            const callContainer = document.createElement('div');
+            callContainer.id = 'callContainer';
+            callContainer.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.9);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            `;
+
+            // Create video elements
+            if (type === 'video') {
+                const localVideo = document.createElement('video');
+                localVideo.id = 'localVideo';
+                localVideo.autoplay = true;
+                localVideo.muted = true;
+                localVideo.style.cssText = `
+                    width: 200px;
+                    height: 150px;
+                    position: absolute;
+                    top: 20px;
+                    right: 20px;
+                    border-radius: 8px;
+                    object-fit: cover;
+                `;
+
+                const remoteVideo = document.createElement('video');
+                remoteVideo.id = 'remoteVideo';
+                remoteVideo.autoplay = true;
+                remoteVideo.style.cssText = `
+                    width: 80%;
+                    max-width: 800px;
+                    height: auto;
+                    border-radius: 12px;
+                `;
+
+                callContainer.appendChild(localVideo);
+                callContainer.appendChild(remoteVideo);
+            }
+
+            // Create call controls
+            const controls = document.createElement('div');
+            controls.style.cssText = `
+                position: absolute;
+                bottom: 40px;
+                display: flex;
+                gap: 20px;
+            `;
+
+            const endCallBtn = document.createElement('button');
+            endCallBtn.innerHTML = '<i class="fas fa-phone-slash"></i>';
+            endCallBtn.style.cssText = `
+                width: 60px;
+                height: 60px;
+                border-radius: 50%;
+                background: #dc3545;
+                color: white;
+                border: none;
+                font-size: 1.5rem;
+                cursor: pointer;
+            `;
+            endCallBtn.onclick = endCall;
+
+            controls.appendChild(endCallBtn);
+            callContainer.appendChild(controls);
+            document.body.appendChild(callContainer);
+
+            // Attach local video track if it's a video call
+            if (type === 'video') {
+                Twilio.Video.createLocalVideoTrack().then(track => {
+                    localVideoTrack = track;
+                    track.attach(document.getElementById('localVideo'));
+                });
+            }
+        }
+
+        function endCall() {
+            if (activeRoom) {
+                activeRoom.disconnect();
+                activeRoom = null;
+            }
+            if (localVideoTrack) {
+                localVideoTrack.stop();
+                localVideoTrack = null;
+            }
+            const callContainer = document.getElementById('callContainer');
+            if (callContainer) {
+                callContainer.remove();
+            }
+        }
+
+        // Render messages
+        function renderMessages() {
+            const chatId = getChatId(currentUser, chatWith);
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+            if (!chatWith) return;
+            const msgs = chats[chatId] || [];
+            msgs.forEach(msg => {
+                const div = document.createElement('div');
+                div.className = 'message' + (msg.from.id === currentUser.id ? ' me' : '');
+                div.textContent = msg.text;
+                chatMessages.appendChild(div);
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Send message
+        document.getElementById('chatForm').onsubmit = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !chatWith) return;
+            const chatId = getChatId(currentUser, chatWith);
+            if (!chats[chatId]) chats[chatId] = [];
+            chats[chatId].push({ from: currentUser, to: chatWith, text, time: Date.now() });
+            input.value = '';
+            renderMessages();
+        };
+
+        // Chat id (unique for any pair)
+        function getChatId(u1, u2) {
+            return [u1.id, u2.id].sort().join('-');
+        }
+
+        // Add new contact
+        document.getElementById('addUserBtn').onclick = function() {
+            const name = prompt('Enter contact name:');
+            if (!name) return;
+            const phone = prompt('Enter phone number:');
+            if (!phone) return;
+            const business = prompt('Enter business name:');
+            if (!business) return;
+            const service = prompt('Enter service type:');
+            if (!service) return;
+
+            const newUser = {
+                id: 'u' + (users.length + 1),
+                name,
+                avatar: name[0],
+                phone,
+                business,
+                service,
+                status: 'offline'
+            };
+
+            users.push(newUser);
+            renderUserList();
+        };
+
+        // Initial render
+        renderUserList();
+    </script>
+</body>
+</html>
+<!-- REPLACE TWILIO KEYS-->

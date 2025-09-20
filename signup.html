@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | Horizon Mart</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .signup-container {
+            max-width: 800px;
+            margin: 60px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+            padding: 36px 28px;
+        }
+        .signup-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        .signup-header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #181c32;
+        }
+        .signup-header p {
+            color: #555;
+            font-size: 1.1rem;
+        }
+        .signup-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        .profile-photo-upload {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .profile-photo-upload:hover {
+            border-color: #3366ff;
+        }
+        .profile-photo-preview {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 10px auto;
+            display: none;
+        }
+        .upload-icon {
+            font-size: 2rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .error-message {
+            color: #e74c3c;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
+        }
+        .success-message {
+            color: #27ae60;
+            font-size: 1rem;
+            margin-bottom: 10px;
+            display: none;
+        }
+        .submit-btn {
+            grid-column: 1 / -1;
+            padding: 14px;
+            background: #3366ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .submit-btn:hover {
+            background: #254edb;
+        }
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .user-type-selector {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .user-type-option {
+            flex: 1;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .user-type-option.selected {
+            border-color: #3366ff;
+            background: #f0f4ff;
+        }
+        .user-type-option i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #666;
+        }
+        .user-type-option.selected i {
+            color: #3366ff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-left">
+            <span class="logo" onclick="window.location.href='index.html'" style="cursor: pointer;"><i class="fas fa-shopping-basket"></i> Horizon Mart</span>
+            <a href="index.html">Home</a>
+            <a href="marketplace.html">Marketplace</a>
+            <a href="advertise.html">Advertise</a>
+            <a href="messages.html">Messages</a>
+            <a href="ai-insights.html">AI Insights</a>
+        </div>
+        <div class="nav-right">
+            <button class="nav-btn nav-signin" onclick="window.location.href='signup.html'">Sign In</button>
+            <button class="nav-btn nav-join" onclick="window.location.href='signup.html'">Join Platform</button>
+        </div>
+    </nav>
+
+    <div class="signup-container">
+        <div class="signup-header">
+            <h1><i class="fas fa-user-plus"></i> Create Your Account</h1>
+            <p>Join Horizon Mart to start your shopping journey</p>
+        </div>
+
+        <form id="signupForm" class="signup-form">
+            <!-- Profile Photo Upload -->
+            <div class="profile-photo-upload" id="photoUpload">
+                <i class="fas fa-camera upload-icon"></i>
+                <p>Click to upload profile photo</p>
+                <img id="photoPreview" class="profile-photo-preview" alt="Profile Preview">
+                <input type="file" id="photoInput" accept="image/*" style="display: none">
+            </div>
+
+            <!-- User Type Selection -->
+            <div class="user-type-selector">
+                <div class="user-type-option" data-type="buyer">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Buyer</h3>
+                    <p>Browse and purchase financial services</p>
+                </div>
+                <div class="user-type-option" data-type="seller">
+                    <i class="fas fa-store"></i>
+                    <h3>Seller</h3>
+                    <p>Offer your financial services</p>
+                </div>
+            </div>
+
+            <!-- Add this after the user type selector -->
+            <div id="sellerPaymentSection" style="display: none;" class="form-group full-width">
+                <h3>Seller Registration Fee</h3>
+                <p>To become a seller, there is a one-time registration fee of $20. This helps us maintain the quality of our marketplace.</p>
+                <div class="payment-details">
+                    <div class="amount-display">
+                        <span>Amount:</span>
+                        <span class="amount">$20.00</span>
+                    </div>
+                    <div id="card-element" class="stripe-element"></div>
+                    <div id="card-errors" class="error-message" role="alert"></div>
+                </div>
+            </div>
+
+            <!-- Personal Information -->
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+
+            <!-- Contact Information -->
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" required>
+            </div>
+            <div class="form-group">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" required>
+            </div>
+            <div class="form-group">
+                <label for="country">Country</label>
+                <input type="text" id="country" name="country" required>
+            </div>
+            <div class="form-group">
+                <label for="website">Website (Optional)</label>
+                <input type="url" id="website" name="website">
+            </div>
+
+            <!-- Additional Details -->
+            <div class="form-group full-width">
+                <label for="bio">Bio/Description</label>
+                <textarea id="bio" name="bio" placeholder="Tell us about yourself..."></textarea>
+            </div>
+
+            <!-- Security -->
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required minlength="8">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required minlength="8">
+            </div>
+
+            <!-- Messages -->
+            <div class="error-message" id="errorMsg"></div>
+            <div class="success-message" id="successMsg"></div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <i class="fas fa-user-plus"></i> Create Account
+            </button>
+        </form>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="user-profile.js"></script>
+    <script>
+        // Profile Photo Upload
+        const photoUpload = document.getElementById('photoUpload');
+        const photoInput = document.getElementById('photoInput');
+        const photoPreview = document.getElementById('photoPreview');
+
+        photoUpload.addEventListener('click', () => photoInput.click());
+
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    photoPreview.src = e.target.result;
+                    photoPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // User Type Selection
+        const userTypeOptions = document.querySelectorAll('.user-type-option');
+        let selectedUserType = '';
+
+        userTypeOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                userTypeOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                selectedUserType = option.dataset.type;
+                
+                // Show/hide payment section for sellers
+                const paymentSection = document.getElementById('sellerPaymentSection');
+                paymentSection.style.display = selectedUserType === 'seller' ? 'block' : 'none';
+            });
+        });
+
+        // Form Submission
+        const form = document.getElementById('signupForm');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Initialize Stripe
+        const stripe = Stripe('pk_test_51OdxnhSIOgzUXX8qvCQXDvnHlBLLaMrMdKgGl9QQQUzS5TXRQZfV9nVLI3JLScBCBPpGlwGzreRF9fBTCUkIFdC800AvRMnJR8'); // Test publishable key
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#32325d',
+                    fontFamily: 'Arial, sans-serif',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#fa755a',
+                    iconColor: '#fa755a'
+                }
+            }
+        });
+        cardElement.mount('#card-element');
+
+        // Handle card errors
+        cardElement.on('change', function(event) {
+            const displayError = document.getElementById('card-errors');
+            if (event.error) {
+                displayError.textContent = event.error.message;
+            } else {
+                displayError.textContent = '';
+            }
+        });
+
+        // Update form submission
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
+
+            try {
+                // Validate passwords match
+                const password = form.password.value;
+                const confirmPassword = form.confirmPassword.value;
+                if (password !== confirmPassword) {
+                    throw new Error('Passwords do not match');
+                }
+
+                // Validate user type selection
+                if (!selectedUserType) {
+                    throw new Error('Please select a user type');
+                }
+
+                // Create form data
+                const formData = new FormData();
+                formData.append('firstName', form.firstName.value);
+                formData.append('lastName', form.lastName.value);
+                formData.append('email', form.email.value);
+                formData.append('phone', form.phone.value);
+                formData.append('address', form.address.value);
+                formData.append('city', form.city.value);
+                formData.append('country', form.country.value);
+                formData.append('website', form.website.value);
+                formData.append('bio', form.bio.value);
+                formData.append('password', password);
+                formData.append('userType', selectedUserType);
+                
+                if (photoInput.files[0]) {
+                    formData.append('profilePhoto', photoInput.files[0]);
+                }
+
+                // If user is a seller, process payment first
+                if (selectedUserType === 'seller') {
+                    const { paymentMethod, error } = await stripe.createPaymentMethod({
+                        type: 'card',
+                        card: cardElement,
+                    });
+
+                    if (error) {
+                        throw new Error(error.message);
+                    }
+
+                    // Add payment method ID to form data
+                    formData.append('paymentMethodId', paymentMethod.id);
+                }
+
+                // Send signup request
+                const response = await fetch('http://localhost:3002/api/signup', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    successMsg.textContent = 'Account created successfully! Redirecting...';
+                    successMsg.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Signup failed');
+                }
+            } catch (error) {
+                errorMsg.textContent = error.message;
+                errorMsg.style.display = 'block';
+                console.error('Signup error:', error);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+            }
+        });
+    </script>
+</body>
+</html>
